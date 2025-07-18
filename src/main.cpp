@@ -1,5 +1,6 @@
 #include "../include/cli.hpp"
 #include "../include/monitor.hpp"
+#include <iostream>
 
 int main() {
     while (true) {
@@ -13,7 +14,6 @@ int main() {
 
         switch (choice) {
             case 1:
-                init_cli();
                 start_monitor();
                 break;
             case 2:

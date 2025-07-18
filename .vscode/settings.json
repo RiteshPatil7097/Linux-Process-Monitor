@@ -5,6 +5,8 @@
         "string": "cpp",
         "vector": "cpp",
         "chrono": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "unordered_map": "cpp",
+        "system_error": "cpp"
     }
 }
