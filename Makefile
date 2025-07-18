@@ -10,3 +10,8 @@ all:
 
 clean:
 	rm -f monitor
+
+
+#   make clean
+#   make
+#   ./monitor
