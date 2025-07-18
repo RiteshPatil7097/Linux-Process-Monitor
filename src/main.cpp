@@ -1,33 +1,40 @@
+#include <iostream>
+#include <ncurses.h>
 #include "../include/cli.hpp"
 #include "../include/monitor.hpp"
-#include <iostream>
 
 int main() {
+    int choice;
+nodelay(stdscr, TRUE);
     while (true) {
-        std::cout << "\n1. Monitor Processes\n"
-                  << "2. Control Process (Kill/Suspend/...)\n"
-                  << "0. Exit\n"
-                  << "Enter choice: ";
+         int ch = getch();
+    if (ch == 'q' || ch == 'Q') {
+        break;  // Exit loop when 'q' is pressed
+    }
 
-        int choice;
+        std::cout << "\n--- Linux Process Manager ---\n";
+        std::cout << "1. Monitor Processes\n";
+        std::cout << "2. Control Process (Kill / Suspend / Resume)\n";
+        std::cout << "3. Exit\n";
+        std::cout << "Enter your choice: ";
         std::cin >> choice;
 
         switch (choice) {
             case 1:
-                 init_cli();
-             start_monitor();
+                init_cli();       // Start ncurses
+                start_monitor();  // Monitor loop
+                endwin();         // Exit ncurses and return to terminal
                 break;
             case 2:
                 handle_process_control();
                 break;
-            case 0:
+            case 3:
+                std::cout << "Exiting...\n";
                 return 0;
             default:
-                std::cout << "Invalid option\n";
+                std::cout << "Invalid option. Try again.\n";
         }
     }
-    
-    init_cli();
-    start_monitor();
+
     return 0;
 }
