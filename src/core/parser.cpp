@@ -5,20 +5,22 @@
 #include <unistd.h>
 #include <string>
 #include <cstring>
+#include <limits.h> 
+
 
 std::vector<ProcessInfo> parse_proc() {
     std::vector<ProcessInfo> result;
     DIR* dir = opendir("/proc");
     if (!dir) return result;
 
-    // Israr - block for getting Uptime
+    
     double uptime = 0.0;
     { 
         std::ifstream temp_file("/proc/uptime");
         if( temp_file.is_open() ) temp_file >> uptime;
     }
     auto  hertz = sysconf(_SC_CLK_TCK);
-    // End of Israr's block
+    
 
     struct dirent* entry;
     while ((entry = readdir(dir)) != nullptr) {
@@ -37,12 +39,6 @@ std::vector<ProcessInfo> parse_proc() {
             ProcessInfo p;
             p.pid = pid;
             
-            // Commented because its hardCoded
-            // iss >> pid >> name;
-
-            // p.name = name;
-            // p.cpu = 0.0;      // Placeholder
-            // p.memory = 0.0;   // Placeholder
 
             std::string comm,dummy;
             char state;
@@ -52,22 +48,35 @@ std::vector<ProcessInfo> parse_proc() {
             iss >> pid >> comm >> state;
 
 
-            for(int i=0; i<10; i++) iss >> dummy; // uptime
+            for(int i=0; i<10; i++) iss >> dummy; 
             iss >> user_time >> sys_time; 
 
-            for(int i=0; i<4; i++) iss >> dummy; // start_time
+            for(int i=0; i<4; i++) iss >> dummy; 
             iss >> start_time;
             
             if (!comm.empty() && comm.front() == '(' && comm.back() == ')') {
                 comm = comm.substr(1, comm.size() - 2);
             }
             p.name = comm;
+            // Israr - Get the executable path
+            std::string exePath = "/proc/" + std::to_string(pid) + "/exe";
+            char buf[PATH_MAX];
+            ssize_t len = readlink(exePath.c_str(), buf, sizeof(buf) - 1);
+            if (len != -1) {
+                 buf[len] = '\0';
+             p.path = std::string(buf);
+            } else {
+                p.path = "[unknown]";
+            }
+             // Israr - Calculated time and cpu usage along with memory
             auto total_time = user_time + sys_time;
-            // it not works then try to multiply by doing uptime * hertz - start_time / hertz;
+            p.time = total_time / static_cast<double>(hertz);
             auto second = uptime - (start_time / (double)hertz);
+
             p.cpu = (second > 0) ? (100.0 * ((total_time / (double)hertz) / second)) : 0.0;
             
             auto statusPath = "/proc/" + std::to_string(pid) + "/status";
+            
             std::ifstream statusFile(statusPath);
             p.memory = 0.0;
             if( statusFile.is_open()) {
@@ -78,8 +87,8 @@ std::vector<ProcessInfo> parse_proc() {
                     std::string label;
                     long memKb;
                     memStream >> label >> memKb;
-                    // currently it would show in KB's , i'll convert it into MB , change if you want in kB
-                    p.memory = memKb / 1024.0; // MB
+                
+                    p.memory = memKb / 1024.0; 
                     break;
                   }
                 }

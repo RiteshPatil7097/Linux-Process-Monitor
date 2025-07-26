@@ -10,4 +10,4 @@ enum class ProcessAction {
 
 bool control_process(int pid, ProcessAction action);
 
-#endif // PROCESS_CONTROL_HPP
+#endif 
