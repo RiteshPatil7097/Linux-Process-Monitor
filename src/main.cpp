@@ -9,7 +9,7 @@ nodelay(stdscr, TRUE);
     while (true) {
          int ch = getch();
     if (ch == 'q' || ch == 'Q') {
-        break;  // Exit loop when 'q' is pressed
+        break;  
     }
 
         std::cout << "\n--- Linux Process Manager ---\n";
@@ -21,9 +21,9 @@ nodelay(stdscr, TRUE);
 
         switch (choice) {
             case 1:
-                init_cli();       // Start ncurses
-                start_monitor();  // Monitor loop
-                endwin();         // Exit ncurses and return to terminal
+                init_cli();      
+                start_monitor(); 
+                endwin();         
                 break;
             case 2:
                 handle_process_control();
